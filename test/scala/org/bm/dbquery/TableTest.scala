@@ -18,6 +18,7 @@ package org.bm.dbquery
 
 import java.sql.{Connection, DriverManager}
 
+import org.bm.dbquery.utils.ResultSetDumper
 import org.scalatest.FunSuite
 
 /**
@@ -26,10 +27,12 @@ import org.scalatest.FunSuite
  */
 class TableTest extends FunSuite {
 
+  val url = ""
+
   test("test table list") {
     Class.forName("oracle.jdbc.OracleDriver")
 
-    val conn: Connection = DriverManager.getConnection("", "D408658", "D408658")
+    val conn: Connection = DriverManager.getConnection(url, "D408658", "D408658")
     val tables: List[Table] = Table(conn, "BATCH_KBC_%")(null, "D408658")
 
     tables foreach { tab =>
@@ -47,5 +50,21 @@ class TableTest extends FunSuite {
 
     conn.close()
   }
+
+  test("ResultSetDumper") {
+    Class.forName("oracle.jdbc.OracleDriver")
+
+    val conn: Connection = DriverManager.getConnection(url, "D408658", "D408658")
+    println(
+      ResultSetDumper.format(
+        ResultSetDumper.dump(
+          conn.getMetaData.getTables(null, "D408658", null, null)
+        )
+      )(None)
+    )
+
+    conn.close()
+  }
+
 
 }
