@@ -28,18 +28,20 @@ import org.scalatest.FunSuite
 class TableTest extends FunSuite {
 
   val url = ""
+  val username: String = ""
+  val password: String = ""
 
   test("test table list") {
     Class.forName("oracle.jdbc.OracleDriver")
 
-    val conn: Connection = DriverManager.getConnection(url, "D408658", "D408658")
-    val tables: List[Table] = Table(conn, "NUMBER_TEST",schemaPattern = "D408658")
+    val conn: Connection = DriverManager.getConnection(url, username, password)
+    val tables: List[Table] = Table(conn, "NUMBER_TEST",schemaPattern = username)
 
     tables foreach { tab =>
       println(tab)
 
 
-      val cols: List[Column] = Column(conn, tab.name, schemaPattern = "D408658")
+      val cols: List[Column] = Column(conn, tab.name, schemaPattern = username)
 
       cols foreach { col =>
         println(s"\t$col")
@@ -54,7 +56,7 @@ class TableTest extends FunSuite {
   test("ResultSetDumper") {
     Class.forName("oracle.jdbc.OracleDriver")
 
-    val conn: Connection = DriverManager.getConnection(url, "D408658", "D408658")
+    val conn: Connection = DriverManager.getConnection(url, username, password)
 
     implicit val maxlength = None
 
@@ -62,7 +64,7 @@ class TableTest extends FunSuite {
 
       ResultSetDumper.format(
         ResultSetDumper.dump(
-          conn.getMetaData.getTables(null, "D408658", "NUMBER_TEST", null)
+          conn.getMetaData.getTables(null, username, "NUMBER_TEST", null)
         )
       )
     )
