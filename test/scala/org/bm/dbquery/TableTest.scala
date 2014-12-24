@@ -33,16 +33,16 @@ class TableTest extends FunSuite {
     Class.forName("oracle.jdbc.OracleDriver")
 
     val conn: Connection = DriverManager.getConnection(url, "D408658", "D408658")
-    val tables: List[Table] = Table(conn, "BATCH_KBC_%")(null, "D408658")
+    val tables: List[Table] = Table(conn, "NUMBER_TEST",schemaPattern = "D408658")
 
     tables foreach { tab =>
-      println(tab.name + " (" + tab.tableType + ")" + tab.catalog + " " + tab.schema)
+      println(tab)
 
 
-      val cols: List[Column] = Column(conn, tab.name, null)(null, "D408658")
+      val cols: List[Column] = Column(conn, tab.name, schemaPattern = "D408658")
 
       cols foreach { col =>
-        println("\t"+col.name + " " + col.typeName + "(" + col.size + ")")
+        println(s"\t$col")
       }
 
 
@@ -55,12 +55,16 @@ class TableTest extends FunSuite {
     Class.forName("oracle.jdbc.OracleDriver")
 
     val conn: Connection = DriverManager.getConnection(url, "D408658", "D408658")
+
+    implicit val maxlength = None
+
     println(
+
       ResultSetDumper.format(
         ResultSetDumper.dump(
-          conn.getMetaData.getTables(null, "D408658", null, null)
+          conn.getMetaData.getTables(null, "D408658", "NUMBER_TEST", null)
         )
-      )(None)
+      )
     )
 
     conn.close()

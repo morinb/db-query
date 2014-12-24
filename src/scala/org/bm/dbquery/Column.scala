@@ -28,7 +28,7 @@ class Column(val catalog: Option[String],
              val schema: Option[String],
              val tableName: String,
              val name: String,
-             val dataType: Integer,
+             val dataType: SqlType,
              val typeName: String,
              val size: Integer,
              val bufferLength: Integer /*Not used*/ ,
@@ -42,11 +42,25 @@ class Column(val catalog: Option[String],
              val charOctetLength: Integer,
              val ordinalPosition: Integer /*starting at 1*/ ,
              val isNullable: String /*YES, NO, empty string*/
-              )
+              ) {
+
+  override def toString: String =
+    if (SqlType.DECIMAL == dataType)
+      if(size != 0 && decimalDigits != 0) {
+        s"$name $typeName($size, $decimalDigits)"
+      } else if (decimalDigits == 0) {
+        s"$name $typeName($size)"
+      } else {
+        s"$name $typeName"
+      }
+    else
+      s"$name $typeName($size)"
+
+}
 
 object Column {
 
-  def apply(conn: Connection, tableName: String, columnNamePattern: String = null)(implicit catalogPattern: String = null, schemaPattern: String = null): List[Column] =
+  def apply(conn: Connection, tableName: String, columnNamePattern: String = null, catalogPattern: String = null, schemaPattern: String = null): List[Column] =
     Column(conn.getMetaData.getColumns(catalogPattern, schemaPattern, tableName, columnNamePattern))
 
 
@@ -59,7 +73,7 @@ object Column {
           Option(rs.getString("TABLE_SCHEM")),
           rs.getString("TABLE_NAME"),
           rs.getString("COLUMN_NAME"),
-          rs.getInt("DATA_TYPE"),
+          SqlType.from(rs.getInt("DATA_TYPE")),
           rs.getString("TYPE_NAME"),
           rs.getInt("COLUMN_SIZE"),
           rs.getInt("BUFFER_LENGTH"),

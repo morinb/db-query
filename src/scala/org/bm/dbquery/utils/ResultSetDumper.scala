@@ -28,10 +28,6 @@ import scala.annotation.tailrec
  */
 object ResultSetDumper {
 
-  object Implicits {
-    val MAX_FORMAT_LENGTH = Some(50)
-  }
-
   def dump(rs: ResultSet): List[List[String]] = {
     var result: List[List[String]] = List()
 

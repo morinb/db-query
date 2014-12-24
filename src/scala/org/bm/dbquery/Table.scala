@@ -26,16 +26,15 @@ class Table(val catalog: Option[String],
             val schema: Option[String],
             val name: String,
             val tableType: String /*TABLE, VIEW, SYSTEM TABLE, GLOBAL TEMPORARY, LOCAL TEMPORARY, ALIAS, SYNONYM*/ ,
-            val remarks: Option[String])
+            val remarks: Option[String]) {
+
+  override def toString: String = s"$name"
+}
 
 object Table {
 
-  object Implicits {
-    implicit val nullString = null
-  }
-
-  def apply(conn: Connection, tableNamePattern: String)(implicit catalogPattern: String, schemaPattern: String): List[Table] =
-    Table(conn.getMetaData.getTables(catalogPattern, schemaPattern, tableNamePattern, Array("TABLE")))
+  def apply(conn: Connection, tableNamePattern: String, catalogPattern: String = null, schemaPattern: String = null): List[Table] =
+    Table(conn.getMetaData.getTables(catalogPattern, schemaPattern, tableNamePattern, null))
 
   def apply(rs: ResultSet): List[Table] = {
 
