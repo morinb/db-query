@@ -35,17 +35,15 @@ class TableTest extends FunSuite {
     tables foreach { tab =>
       println(tab.name + " (" + tab.tableType + ")" + tab.catalog + " " + tab.schema)
 
-/*
-      val cols: List[Column] = Column(conn, tab.name, null)
+
+      val cols: List[Column] = Column(conn, tab.name, null)(null, "D408658")
 
       cols foreach { col =>
-        println(col.name + " " + col.typeName + "[" + col.size + "]")
+        println("\t"+col.name + " " + col.typeName + "(" + col.size + ")")
       }
-*/
+
 
     }
-
-
 
     conn.close()
   }
