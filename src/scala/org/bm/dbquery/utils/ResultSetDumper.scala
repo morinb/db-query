@@ -73,7 +73,7 @@ object ResultSetDumper {
       }
     }
 
-    val lineLength = maxColumnSize.foldLeft(0)(_ + _) + 3 * maxColumnSize.size + 1
+    val lineLength = maxColumnSize.foldLeft(0)(_ + _) + 3 * maxColumnSize.size
 
     val sb = new StringBuilder(lineLength)
 
@@ -97,7 +97,7 @@ object ResultSetDumper {
 
 
         sb ++= " " ++ realText
-        sb ++= " | "
+        sb ++= " |"
       }
 
       if (rowIndex == 0) {

@@ -24,37 +24,41 @@ import scala.annotation.tailrec
  *
  * @author Baptiste Morin
  */
-class Table(val catalog: Option[String],
-            val schema: Option[String],
-            val name: String,
-            val tableType: String /*TABLE, VIEW, SYSTEM TABLE, GLOBAL TEMPORARY, LOCAL TEMPORARY, ALIAS, SYNONYM*/ ,
-            val remarks: Option[String]) {
-
-  override def toString: String = s"$name"
+class Schema(val catalog: Option[String], val name: String) {
+  override def toString: String = s"${
+    catalog match {
+      case Some(c) => c + "."
+      case None => ""
+    }
+  }$name"
 }
 
-object Table {
+object Schema {
+  def apply(conn: Connection, catalog: Catalog): List[Schema] =
+    Schema(conn.getMetaData.getSchemas(catalog.name, null))
 
-  def apply(conn: Connection, tableNamePattern: String, catalogPattern: String = null, schemaPattern: String = null): List[Table] =
-    Table(conn.getMetaData.getTables(catalogPattern, schemaPattern, tableNamePattern, null))
 
-  def apply(rs: ResultSet): List[Table] = {
+  def apply(conn: Connection, catalog: String, schemaNamePattern: String = null): List[Schema] =
+    Schema(conn.getMetaData.getSchemas(catalog, schemaNamePattern))
 
+  def apply(rs: ResultSet): List[Schema] = {
     @tailrec
-    def accumulator(acc: List[Table]): List[Table] = {
+    def accumulator(acc: List[Schema]): List[Schema] =
       if (rs.next()) {
-        val tab = new Table(
-          Option(rs.getString("TABLE_CAT")),
+        val s = new Schema(
           Option(rs.getString("TABLE_SCHEM")),
-          rs.getString("TABLE_NAME"),
-          rs.getString("TABLE_TYPE"),
-          Option(rs.getString("REMARKS")))
+          rs.getString("TABLE_CATALOG")
+        )
 
-        accumulator(acc :+ tab)
+        accumulator(acc :+ s)
       } else {
         acc
       }
-    }
+
     accumulator(Nil)
+
   }
+
 }
+
+

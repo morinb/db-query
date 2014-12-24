@@ -31,11 +31,13 @@ class TableTest extends FunSuite {
   val username: String = ""
   val password: String = ""
 
+  implicit val maxlength = None
+
   test("test table list") {
     Class.forName("oracle.jdbc.OracleDriver")
 
     val conn: Connection = DriverManager.getConnection(url, username, password)
-    val tables: List[Table] = Table(conn, "NUMBER_TEST",schemaPattern = username)
+    val tables: List[Table] = Table(conn, "NUMBER_TEST", schemaPattern = username)
 
     tables foreach { tab =>
       println(tab)
@@ -58,7 +60,7 @@ class TableTest extends FunSuite {
 
     val conn: Connection = DriverManager.getConnection(url, username, password)
 
-    implicit val maxlength = None
+
 
     println(
 
@@ -70,6 +72,31 @@ class TableTest extends FunSuite {
     )
 
     conn.close()
+  }
+
+  test("API") {
+    Class.forName("oracle.jdbc.OracleDriver")
+    val conn: Connection = DriverManager.getConnection(url, username, password)
+
+
+    println("Primary Key")
+    println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getPrimaryKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
+
+    println("Imported Keys")
+    println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getImportedKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
+
+    println("Exported Keys")
+    println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getExportedKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
+
+    val tables = Table(conn, "BATCH_KBC_DETAIL", schemaPattern = "D408658")
+    val pk = PrimaryKey(conn, tables(0))
+    val fk = ForeignKey(conn, tables(0))
+
+    println(s"table: ${tables(0)}\nPK: ${pk mkString ", "}\nFK: ${fk.map( foreignkey => foreignkey.detailledToString) mkString ", "}")
+
+
+    conn.close()
+
   }
 
 

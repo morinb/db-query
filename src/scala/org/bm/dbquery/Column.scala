@@ -46,7 +46,7 @@ class Column(val catalog: Option[String],
 
   override def toString: String =
     if (SqlType.DECIMAL == dataType)
-      if(size != 0 && decimalDigits != 0) {
+      if (size != 0 && decimalDigits != 0) {
         s"$name $typeName($size, $decimalDigits)"
       } else if (decimalDigits == 0) {
         s"$name $typeName($size)"
@@ -60,13 +60,16 @@ class Column(val catalog: Option[String],
 
 object Column {
 
+  def apply(conn: Connection, table: Table): List[Column] =
+    Column(conn, table.name, null, table.catalog match { case Some(c) => c; case None => null}, table.schema match { case Some(s) => s; case None => null})
+
   def apply(conn: Connection, tableName: String, columnNamePattern: String = null, catalogPattern: String = null, schemaPattern: String = null): List[Column] =
     Column(conn.getMetaData.getColumns(catalogPattern, schemaPattern, tableName, columnNamePattern))
 
 
   def apply(rs: ResultSet): List[Column] = {
     @tailrec
-    def accumulator(rs: ResultSet, acc: List[Column]): List[Column] = {
+    def accumulator(acc: List[Column]): List[Column] =
       if (rs.next()) {
         val col = new Column(
           Option(rs.getString("TABLE_CAT")),
@@ -88,13 +91,13 @@ object Column {
           rs.getInt("ORDINAL_POSITION"),
           rs.getString("IS_NULLABLE"))
 
-        accumulator(rs, acc :+ col)
+        accumulator(acc :+ col)
       } else {
         acc
       }
-    }
 
-    accumulator(rs, Nil)
+
+    accumulator(Nil)
   }
 
 
