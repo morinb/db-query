@@ -30,30 +30,24 @@ class TableTest extends FunSuite {
     Class.forName("oracle.jdbc.OracleDriver")
 
     val conn: Connection = DriverManager.getConnection("", "D408658", "D408658")
+    val tables: List[Table] = Table(conn, "BATCH_KBC_%")(null, "D408658")
 
-    import Table.Implicits.nullString
-    val batchKBCDetail = Table(conn)("BATCH_KBC_DETAIL")
+    tables foreach { tab =>
+      println(tab.name + " (" + tab.tableType + ")" + tab.catalog + " " + tab.schema)
 
+/*
+      val cols: List[Column] = Column(conn, tab.name, null)
 
-    val tab : Table= batchKBCDetail match {
-      case Some(t: Table) => t
-      case None => throw new RuntimeException("No table found")
-    }
-
-    println(tab.name +" ("+ tab.tableType+")")
-
-    val cols: List[Column] = Column(tab.name, conn)(null)
-
-    cols foreach { col =>
-      println(col.name+" "+col.typeName+"["+col.size+"]")
+      cols foreach { col =>
+        println(col.name + " " + col.typeName + "[" + col.size + "]")
+      }
+*/
 
     }
+
 
 
     conn.close()
-
-
-
   }
 
 }

@@ -42,17 +42,11 @@ class Column(val catalog: Option[String],
              val charOctetLength: Integer,
              val ordinalPosition: Integer /*starting at 1*/ ,
              val isNullable: String /*YES, NO, empty string*/
-             //,
-             //scopeCatLog: Option[String] /* not defined if DATA_TYPE is not REF (2006)*/ ,
-             //scopeSchema: Option[String] /* not defined if DATA_TYPE is not REF (2006)*/ ,
-             //scopeTable: Option[String] /* not defined if DATA_TYPE is not REF (2006)*/ ,
-             //sourceDataType: Option[Short] /* not defined if DATA_TYPE is not DISTINCT (2001) or REF (2006)*/ ,
-             //isAutoIncrement: String /* YES, NO, empty string*/
               )
 
 object Column {
 
-  def apply(tableName: String, conn: Connection)(columnNamePattern: String = null)(implicit catalogPattern: String = null, schemaPattern: String = null): List[Column] =
+  def apply(conn: Connection, tableName: String, columnNamePattern: String = null)(implicit catalogPattern: String = null, schemaPattern: String = null): List[Column] =
     Column(conn.getMetaData.getColumns(catalogPattern, schemaPattern, tableName, columnNamePattern))
 
 

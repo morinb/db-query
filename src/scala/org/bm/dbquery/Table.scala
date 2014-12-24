@@ -26,14 +26,7 @@ class Table(val catalog: Option[String],
             val schema: Option[String],
             val name: String,
             val tableType: String /*TABLE, VIEW, SYSTEM TABLE, GLOBAL TEMPORARY, LOCAL TEMPORARY, ALIAS, SYNONYM*/ ,
-            val remarks: Option[String]/*,
-
-            typeCatalog: Option[String],
-            typeSchema: Option[String],
-            typeName: Option[String],
-            selfReferencingColumnName: Option[String],
-            refGeneration: Option[String]*/
-             )
+            val remarks: Option[String])
 
 object Table {
 
@@ -41,24 +34,25 @@ object Table {
     implicit val nullString = null
   }
 
-  def apply(conn: Connection)(tableNamePattern: String = null)(implicit catalogPattern: String, schemaPattern: String): Option[Table] =
+  def apply(conn: Connection, tableNamePattern: String)(implicit catalogPattern: String, schemaPattern: String): List[Table] =
     Table(conn.getMetaData.getTables(catalogPattern, schemaPattern, tableNamePattern, Array("TABLE")))
 
-  def apply(rs: ResultSet): Option[Table] =
-    if (rs.next()) {
-      Some(new Table(
-        Option(rs.getString("TABLE_CAT")),
-        Option(rs.getString("TABLE_SCHEM")),
-        rs.getString("TABLE_NAME"),
-        rs.getString("TABLE_TYPE"),
-        Option(rs.getString("REMARKS"))/*,
-        Option(rs.getString("TYPE_CAT")),
-        Option(rs.getString("TYPE_SCHEM")),
-        Option(rs.getString("TYPE_NAME")),
-        Option(rs.getString("SELF_REFERENCING_COL_NAME")),
-        Option(rs.getString("REF_GENERATION"))*/
-      ))
-    } else {
-      None
+  def apply(rs: ResultSet): List[Table] = {
+
+    def accumulator(rs: ResultSet, acc: List[Table]): List[Table] = {
+      if (rs.next()) {
+        val tab = new Table(
+          Option(rs.getString("TABLE_CAT")),
+          Option(rs.getString("TABLE_SCHEM")),
+          rs.getString("TABLE_NAME"),
+          rs.getString("TABLE_TYPE"),
+          Option(rs.getString("REMARKS")))
+
+        accumulator(rs, acc :+ tab)
+      } else {
+        acc
+      }
     }
+    accumulator(rs, Nil)
+  }
 }
