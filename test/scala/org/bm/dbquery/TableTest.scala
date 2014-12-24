@@ -29,7 +29,7 @@ class TableTest extends FunSuite {
   test("test table list") {
     Class.forName("oracle.jdbc.OracleDriver")
 
-    val conn: Connection = DriverManager.getConnection("jdbc:oracle:thin:@atpds1.fr.net.intra:1521:ATPDEV01", "D408658", "D408658")
+    val conn: Connection = DriverManager.getConnection("", "D408658", "D408658")
 
     import Table.Implicits.nullString
     val batchKBCDetail = Table(conn)("BATCH_KBC_DETAIL")
