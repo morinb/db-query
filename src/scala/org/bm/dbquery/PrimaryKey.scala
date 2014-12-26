@@ -37,16 +37,16 @@ class PrimaryKey(val catalog: Option[String],
     case None => ""
   }
 
-  override def detailledToString: String = toString
+  override def detailledToString: String = toString + s"($columnName)"
 }
 
 object PrimaryKey {
 
-  def apply(conn: Connection, tableName: String, catalog: String = null, schema: String = null): List[PrimaryKey] =
+  def apply(tableName: String, catalog: String = null, schema: String = null)(implicit conn: Connection): List[PrimaryKey] =
     PrimaryKey(conn.getMetaData.getPrimaryKeys(catalog, schema, tableName))
 
-  def apply(conn: Connection, table: Table): List[PrimaryKey] =
-    PrimaryKey(conn, table.name, table.catalog match { case Some(c) => c; case None => null}, table.schema match { case Some(s) => s; case None => null})
+  def apply(table: Table)(implicit conn: Connection): List[PrimaryKey] =
+    PrimaryKey(table.name, table.catalog match { case Some(c) => c; case None => null}, table.schema match { case Some(s) => s; case None => null})
 
   def apply(rs: ResultSet): List[PrimaryKey] = {
     @tailrec

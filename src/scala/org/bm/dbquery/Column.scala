@@ -60,10 +60,10 @@ class Column(val catalog: Option[String],
 
 object Column {
 
-  def apply(conn: Connection, table: Table): List[Column] =
-    Column(conn, table.name, null, table.catalog match { case Some(c) => c; case None => null}, table.schema match { case Some(s) => s; case None => null})
+  def apply(table: Table)(implicit conn: Connection): List[Column] =
+    Column(table.name, null, table.catalog match { case Some(c) => c; case None => null}, table.schema match { case Some(s) => s; case None => null})
 
-  def apply(conn: Connection, tableName: String, columnNamePattern: String = null, catalogPattern: String = null, schemaPattern: String = null): List[Column] =
+  def apply(tableName: String = null, columnNamePattern: String = null, catalogPattern: String = null, schemaPattern: String = null)(implicit conn: Connection): List[Column] =
     Column(conn.getMetaData.getColumns(catalogPattern, schemaPattern, tableName, columnNamePattern))
 
 

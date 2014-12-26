@@ -53,16 +53,16 @@ class ForeignKey(val pkTableCatalog: Option[String],
 
 object ForeignKey {
 
-  def referencingKeys(conn: Connection, table: Table): List[ForeignKey] =
-    referencingKeys(conn, table.name, table.catalog match { case Some(c) => c; case None => null}, table.schema match { case Some(s) => s; case None => null})
+  def referencingKeys(table: Table)(implicit conn: Connection): List[ForeignKey] =
+    referencingKeys(table.name, table.catalog match { case Some(c) => c; case None => null}, table.schema match { case Some(s) => s; case None => null})
 
-  def referencingKeys(conn: Connection, tableName: String, catalog: String = null, schema: String = null): List[ForeignKey] =
+  def referencingKeys(tableName: String, catalog: String = null, schema: String = null)(implicit conn: Connection): List[ForeignKey] =
     ForeignKey(conn.getMetaData.getExportedKeys(catalog, schema, tableName))
 
-  def apply(conn: Connection, table: Table): List[ForeignKey] =
-    ForeignKey(conn, table.name, table.catalog match { case Some(c) => c; case None => null}, table.schema match { case Some(s) => s; case None => null})
+  def apply(table: Table)(implicit conn: Connection): List[ForeignKey] =
+    ForeignKey(table.name, table.catalog match { case Some(c) => c; case None => null}, table.schema match { case Some(s) => s; case None => null})
 
-  def apply(conn: Connection, tableName: String, catalog: String = null, schema: String = null): List[ForeignKey] =
+  def apply(tableName: String, catalog: String = null, schema: String = null)(implicit conn: Connection): List[ForeignKey] =
     ForeignKey(conn.getMetaData.getImportedKeys(catalog, schema, tableName))
 
   def apply(rs: ResultSet): List[ForeignKey] = {

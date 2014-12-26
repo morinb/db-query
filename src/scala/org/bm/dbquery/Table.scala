@@ -35,7 +35,7 @@ class Table(val catalog: Option[String],
 
 object Table {
 
-  def apply(conn: Connection, tableNamePattern: String, catalogPattern: String = null, schemaPattern: String = null): List[Table] =
+  def apply(tableNamePattern: String = null, catalogPattern: String = null, schemaPattern: String = null)(implicit conn: Connection): List[Table] =
     Table(conn.getMetaData.getTables(catalogPattern, schemaPattern, tableNamePattern, null))
 
   def apply(rs: ResultSet): List[Table] = {

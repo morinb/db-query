@@ -24,21 +24,16 @@ import scala.annotation.tailrec
  *
  * @author Baptiste Morin
  */
-class Schema(val catalog: Option[String], val name: String) {
-  override def toString: String = s"${
-    catalog match {
-      case Some(c) => c + "."
-      case None => ""
-    }
-  }$name"
+class Schema(val name: String) {
+  override def toString: String = name
 }
 
 object Schema {
-  def apply(conn: Connection, catalog: Catalog): List[Schema] =
+  def apply(catalog: Catalog)(implicit conn: Connection): List[Schema] =
     Schema(conn.getMetaData.getSchemas(catalog.name, null))
 
 
-  def apply(conn: Connection, catalog: String, schemaNamePattern: String = null): List[Schema] =
+  def apply(catalog: String = null, schemaNamePattern: String = null)(implicit conn: Connection): List[Schema] =
     Schema(conn.getMetaData.getSchemas(catalog, schemaNamePattern))
 
   def apply(rs: ResultSet): List[Schema] = {
@@ -46,8 +41,7 @@ object Schema {
     def accumulator(acc: List[Schema]): List[Schema] =
       if (rs.next()) {
         val s = new Schema(
-          Option(rs.getString("TABLE_SCHEM")),
-          rs.getString("TABLE_CATALOG")
+          rs.getString("TABLE_SCHEM")
         )
 
         accumulator(acc :+ s)

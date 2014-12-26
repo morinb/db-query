@@ -28,6 +28,10 @@ import scala.annotation.tailrec
  */
 object ResultSetDumper {
 
+  object Implicits {
+    implicit lazy val MaxLength = None
+  }
+
   def dump(rs: ResultSet): List[List[String]] = {
     var result: List[List[String]] = List()
 

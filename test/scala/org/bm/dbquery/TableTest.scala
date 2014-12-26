@@ -19,6 +19,7 @@ package org.bm.dbquery
 import java.sql.{Connection, DriverManager}
 
 import org.bm.dbquery.utils.ResultSetDumper
+import org.bm.dbquery.utils.WithResource.withResource
 import org.scalatest.FunSuite
 
 /**
@@ -31,73 +32,113 @@ class TableTest extends FunSuite {
   val username: String = ""
   val password: String = ""
 
-  implicit val maxlength = None
+  import org.bm.dbquery.utils.ResultSetDumper.Implicits._
+
 
   test("test table list") {
+
     Class.forName("oracle.jdbc.OracleDriver")
 
-    val conn: Connection = DriverManager.getConnection(url, username, password)
-    val tables: List[Table] = Table(conn, "NUMBER_TEST", schemaPattern = username)
+    implicit val conn: Connection = DriverManager.getConnection(url, username, password)
+    withResource(conn) {
+      val tables: List[Table] = Table("NUMBER_TEST", schemaPattern = username)
 
-    tables foreach { tab =>
-      println(tab)
+      tables foreach { tab =>
+        println(tab)
 
+        val cols: List[Column] = Column(tab.name, schemaPattern = username)
 
-      val cols: List[Column] = Column(conn, tab.name, schemaPattern = username)
-
-      cols foreach { col =>
-        println(s"\t$col")
+        cols foreach { col =>
+          println(s"\t$col")
+        }
       }
-
-
     }
-
-    conn.close()
   }
 
   test("ResultSetDumper") {
     Class.forName("oracle.jdbc.OracleDriver")
 
     val conn: Connection = DriverManager.getConnection(url, username, password)
+    withResource(conn) {
+      println(
 
-
-
-    println(
-
-      ResultSetDumper.format(
-        ResultSetDumper.dump(
-          conn.getMetaData.getTables(null, username, "NUMBER_TEST", null)
+        ResultSetDumper.format(
+          ResultSetDumper.dump(
+            conn.getMetaData.getSchemas(null, null)
+          )
         )
       )
-    )
-
-    conn.close()
+    }
   }
 
   test("API") {
     Class.forName("oracle.jdbc.OracleDriver")
-    val conn: Connection = DriverManager.getConnection(url, username, password)
+    implicit val conn: Connection = DriverManager.getConnection(url, username, password)
 
+    withResource(conn) {
+      println("Primary Key")
+      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getPrimaryKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
 
-    println("Primary Key")
-    println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getPrimaryKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
+      println("Imported Keys")
+      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getImportedKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
 
-    println("Imported Keys")
-    println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getImportedKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
+      println("Exported Keys")
+      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getExportedKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
 
-    println("Exported Keys")
-    println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getExportedKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
+      val tables = Table("BATCH_KBC_DETAIL", schemaPattern = "D408658")
+      val pk = PrimaryKey(tables(0))
+      val fk = ForeignKey(tables(0))
 
-    val tables = Table(conn, "BATCH_KBC_DETAIL", schemaPattern = "D408658")
-    val pk = PrimaryKey(conn, tables(0))
-    val fk = ForeignKey(conn, tables(0))
+      println(s"table: ${tables(0)}\nPK: ${pk mkString ", "}\nFK: ${fk.map(foreignKey => foreignKey.detailledToString) mkString ", "}")
 
-    println(s"table: ${tables(0)}\nPK: ${pk mkString ", "}\nFK: ${fk.map( foreignkey => foreignkey.detailledToString) mkString ", "}")
-
-
-    conn.close()
+    }
 
   }
 
+  test("All tables") {
+    Class.forName("oracle.jdbc.OracleDriver")
+
+    implicit val conn: Connection = DriverManager.getConnection(url, username, password)
+
+
+
+    withResource(conn) {
+      val schemas = Schema(schemaNamePattern = username)
+      println(s"There are ${schemas.size} schemas.")
+      schemas foreach { schema =>
+        println(schema)
+
+        val tables = Table(schemaPattern = schema.name, tableNamePattern = "BATCH_KBC%")
+        println(s"There are ${tables.size} tables.")
+        tables foreach { table =>
+          println(s"\t- $table")
+
+          val columns = Column(table)
+          val primaryKeys = PrimaryKey(table)
+          val foreignKeys = ForeignKey(table)
+
+          println("Primary Keys: ")
+          primaryKeys foreach { k =>
+            println(k.detailledToString)
+          }
+
+          println("Foreign Keys: ")
+          foreignKeys foreach { k =>
+            println(k.detailledToString)
+          }
+          println("Columns")
+          columns foreach println
+
+        }
+        println("----------")
+        println
+
+      }
+      println("----------")
+      println
+    }
+
+    assert(conn.isClosed)
+  }
 
 }
