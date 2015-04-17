@@ -96,7 +96,6 @@ object Column {
         acc
       }
 
-
     accumulator(Nil)
   }
 

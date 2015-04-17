@@ -28,7 +28,7 @@ import org.scalatest.FunSuite
  */
 class TableTest extends FunSuite {
 
-  val url = ""
+  val url = "jdbc:oracle:thin:@server:1521:sid"
   val username: String = ""
   val password: String = ""
 
@@ -77,19 +77,19 @@ class TableTest extends FunSuite {
 
     withResource(conn) {
       println("Primary Key")
-      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getPrimaryKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
+      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getPrimaryKeys(null, "D408658", "BDOMO_RFDEJCL"))))
 
       println("Imported Keys")
-      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getImportedKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
+      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getImportedKeys(null, "D408658", "BDOMO_RFDEJCL"))))
 
       println("Exported Keys")
-      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getExportedKeys(null, "D408658", "BATCH_KBC_DETAIL"))))
+      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getExportedKeys(null, "D408658", "BDOMO_RFDEJCL"))))
 
-      val tables = Table("BATCH_KBC_DETAIL", schemaPattern = "D408658")
-      val pk = PrimaryKey(tables(0))
-      val fk = ForeignKey(tables(0))
+      val tables = Table("BDOMO_RFDEJCL", schemaPattern = "D408658")
+      val pk = PrimaryKey(tables.head)
+      val fk = ForeignKey(tables.head)
 
-      println(s"table: ${tables(0)}\nPK: ${pk mkString ", "}\nFK: ${fk.map(foreignKey => foreignKey.detailledToString) mkString ", "}")
+      println(s"table: ${tables.head}\nPK: ${pk mkString ", "}\nFK: ${fk.map(foreignKey => foreignKey.detailledToString) mkString ", "}")
 
     }
 
@@ -99,8 +99,6 @@ class TableTest extends FunSuite {
     Class.forName("oracle.jdbc.OracleDriver")
 
     implicit val conn: Connection = DriverManager.getConnection(url, username, password)
-
-
 
     withResource(conn) {
       val schemas = Schema(schemaNamePattern = username)
@@ -131,11 +129,11 @@ class TableTest extends FunSuite {
 
         }
         println("----------")
-        println
+        println()
 
       }
       println("----------")
-      println
+      println()
     }
 
     assert(conn.isClosed)

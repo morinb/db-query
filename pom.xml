@@ -4,7 +4,7 @@
 
     <groupId>org.bm</groupId>
     <artifactId>db-query</artifactId>
-    <version>0.1.0.1</version>
+    <version>0.1.0.3</version>
     <packaging>jar</packaging>
 
     <name>DB Query</name>
@@ -167,13 +167,13 @@
     <dependencies>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.10</artifactId>
-            <version>1.9.1</version>
+            <artifactId>scalatest_2.11</artifactId>
+            <version>2.2.4</version>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>2.10.2</version>
+            <version>2.11.5</version>
         </dependency>
 
         <dependency>
