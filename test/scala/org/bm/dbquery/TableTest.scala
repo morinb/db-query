@@ -28,8 +28,8 @@ import org.scalatest.FunSuite
  */
 class TableTest extends FunSuite {
 
-  val url = "jdbc:oracle:thin:@server:1521:sid"
-  val username: String = ""
+  val url = "jdbc:h2:mem:"
+  val username: String = "sa"
   val password: String = ""
 
   import org.bm.dbquery.utils.ResultSetDumper.Implicits._
@@ -37,7 +37,7 @@ class TableTest extends FunSuite {
 
   test("test table list") {
 
-    Class.forName("oracle.jdbc.OracleDriver")
+//    Class.forName("oracle.jdbc.OracleDriver")
 
     implicit val conn: Connection = DriverManager.getConnection(url, username, password)
     withResource(conn) {
@@ -56,7 +56,7 @@ class TableTest extends FunSuite {
   }
 
   test("ResultSetDumper") {
-    Class.forName("oracle.jdbc.OracleDriver")
+//    Class.forName("oracle.jdbc.OracleDriver")
 
     val conn: Connection = DriverManager.getConnection(url, username, password)
     withResource(conn) {
@@ -72,20 +72,23 @@ class TableTest extends FunSuite {
   }
 
   test("API") {
-    Class.forName("oracle.jdbc.OracleDriver")
+//    Class.forName("oracle.jdbc.OracleDriver")
     implicit val conn: Connection = DriverManager.getConnection(url, username, password)
 
     withResource(conn) {
+      conn.createStatement().execute("CREATE TABLE BDOMO_RFDEJCL(id number(15), name varchar2(32))")
+
+
       println("Primary Key")
-      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getPrimaryKeys(null, "D408658", "BDOMO_RFDEJCL"))))
+      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getPrimaryKeys(null, "sa", "BDOMO_RFDEJCL"))))
 
       println("Imported Keys")
-      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getImportedKeys(null, "D408658", "BDOMO_RFDEJCL"))))
+      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getImportedKeys(null, "sa", "BDOMO_RFDEJCL"))))
 
       println("Exported Keys")
-      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getExportedKeys(null, "D408658", "BDOMO_RFDEJCL"))))
+      println(ResultSetDumper.format(ResultSetDumper.dump(conn.getMetaData.getExportedKeys(null, "sa", "BDOMO_RFDEJCL"))))
 
-      val tables = Table("BDOMO_RFDEJCL", schemaPattern = "D408658")
+      val tables = Table("BDOMO_RFDEJCL", schemaPattern = "sa")
       val pk = PrimaryKey(tables.head)
       val fk = ForeignKey(tables.head)
 
@@ -96,7 +99,7 @@ class TableTest extends FunSuite {
   }
 
   test("All tables") {
-    Class.forName("oracle.jdbc.OracleDriver")
+//    Class.forName("oracle.jdbc.OracleDriver")
 
     implicit val conn: Connection = DriverManager.getConnection(url, username, password)
 

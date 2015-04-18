@@ -27,9 +27,9 @@ import org.scalatest.FunSuite
  */
 class DslQueryTest extends FunSuite {
 
-  val driver = "oracle.jdbc.OracleDriver"
-  val url = "jdbc:oracle:thin:@server:1521:sid"
-  val username = ""
+  val driver = "org.h2.Driver"
+  val url = "jdbc:h2:mem:"
+  val username = "sa"
   val password = ""
 
   Class.forName(driver)
@@ -39,7 +39,7 @@ class DslQueryTest extends FunSuite {
 
   test("DSL") {
 
-    val res = select(*) from "branch" where "1=1" and "1!=2" execute map
+    val res = select(*) from "dual" where "1=1" and "1!=2" execute map
 
     res foreach { ls =>
       ls foreach { l =>
