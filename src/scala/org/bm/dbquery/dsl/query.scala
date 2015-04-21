@@ -27,18 +27,15 @@ import scala.language.implicitConversions
 object query {
   implicit def stringToQueryElem(s: String): QueryElem = Static(s)
 
-  implicit def asteriskToQueryElemList(value: *.type): List[QueryElem] = List(value)
-
-  case class Select(params: List[QueryElem])(implicit conn: Connection) {
+  case class select(params: List[QueryElem])(implicit conn: Connection) {
     def from(s: String): From = From(this, s)
   }
 
-  object select {
-    def apply(value: *.type)(implicit conn: Connection): Select = Select(value)
-  }
 
-  case class From(select: Select, tableName: String)(implicit conn: Connection) {
+  case class From(select: select, tableName: String)(implicit conn: Connection) extends Executable {
     def where(conditions: List[ConditionElem]): Where = Where(this, conditions)
+
+    override def execute[T](f: ResultSet => List[T]): List[T] = executeQuery(f, this)
 
     def order_by(params: List[QueryElem]): OrderBy = OrderBy(Where(this, Nil), params)
   }
@@ -70,6 +67,16 @@ object query {
     map(conn.prepareStatement(sb.toString()).executeQuery())
   }
 
+  private def executeQuery[T](map: ResultSet => List[T], from: From)(implicit conn: Connection): List[T] = {
+    val sb: StringBuilder = new StringBuilder()
+
+    sb ++= "select " + from.select.params.mkString(", ") + " from " + from.tableName
+
+    println(sb.toString())
+
+    map(conn.prepareStatement(sb.toString()).executeQuery())
+  }
+
 
   case class GroupBy(params: List[QueryElem]) extends Executable {
     override def execute[T](map: (ResultSet) => List[T]): List[T] = Nil
@@ -79,7 +86,11 @@ object query {
     def execute[T](map: ResultSet => List[T]): List[T]
   }
 
+  implicit def listStringToListQueryElem(ls: List[String]): List[QueryElem] = ls map { s => Static(s) }
+
   implicit def conditionElemToList(c: ConditionElem): List[ConditionElem] = List(c)
+
+  implicit def stringToQueryElemList(s: String): List[QueryElem] = List(Static(s))
 
   implicit def stringToConditionElem(s: String): List[ConditionElem] =
     if (isParameterCharPresent(s)) {
@@ -105,8 +116,8 @@ object query {
     def +(elem: List[QueryElem]) = this :: elem
   }
 
-  case object * extends QueryElem
-
-  case class Static(name: String) extends QueryElem
+  case class Static(name: String) extends QueryElem {
+    override def toString: String = name
+  }
 
 }

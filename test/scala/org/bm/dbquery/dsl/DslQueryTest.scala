@@ -18,7 +18,8 @@ package org.bm.dbquery.dsl
 
 import java.sql.{Connection, DriverManager, ResultSet}
 
-import org.bm.dbquery.dsl.query.{*, select}
+import org.bm.dbquery.dsl.query.select
+import org.bm.dbquery.utils.ResultSetDumper
 import org.scalatest.FunSuite
 
 /**
@@ -37,17 +38,14 @@ class DslQueryTest extends FunSuite {
   implicit val connection: Connection = DriverManager.getConnection(url, username, password)
 
 
+
+
   test("DSL") {
 
-    val res = select(*) from "dual" where "1=1" and "1!=2" execute map
+    val res = select("*") from "dual" execute ResultSetDumper.dump
 
-    res foreach { ls =>
-      ls foreach { l =>
-        print(" | " + l)
-      }
-      println()
-    }
-
+    import ResultSetDumper.Implicits.MaxLength
+    println(ResultSetDumper.format(res))
 
   }
 

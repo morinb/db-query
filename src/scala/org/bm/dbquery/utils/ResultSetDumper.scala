@@ -82,7 +82,6 @@ object ResultSetDumper {
     val sb = new StringBuilder(lineLength)
 
     for ((cols, rowIndex) <- rows.view.zipWithIndex) {
-      val resultRows: Array[String] = new Array[String](rows.size)
 
       for ((col, colIndex) <- cols.view.zipWithIndex) {
         val txt = if (col == null) "null" else col

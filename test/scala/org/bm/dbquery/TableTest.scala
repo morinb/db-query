@@ -16,9 +16,8 @@
 
 package org.bm.dbquery
 
-import java.sql.{Connection, DriverManager}
+import java.sql.{Connection, DriverManager, ResultSet}
 
-import org.bm.dbquery.dsl.query.{*, select}
 import org.bm.dbquery.utils.ResultSetDumper
 import org.bm.dbquery.utils.WithResource.withResource
 import org.scalatest.FunSuite
@@ -40,7 +39,7 @@ class TableTest extends FunSuite {
 
   test("test table list") {
 
-//    Class.forName("oracle.jdbc.OracleDriver")
+    //    Class.forName("oracle.jdbc.OracleDriver")
 
     implicit val conn: Connection = DriverManager.getConnection(url, username, password)
     withResource(conn) {
@@ -59,7 +58,7 @@ class TableTest extends FunSuite {
   }
 
   test("ResultSetDumper") {
-//    Class.forName("oracle.jdbc.OracleDriver")
+    //    Class.forName("oracle.jdbc.OracleDriver")
 
     val conn: Connection = DriverManager.getConnection(url, username, password)
     withResource(conn) {
@@ -75,7 +74,7 @@ class TableTest extends FunSuite {
   }
 
   test("API") {
-//    Class.forName("oracle.jdbc.OracleDriver")
+    //    Class.forName("oracle.jdbc.OracleDriver")
     implicit val conn: Connection = DriverManager.getConnection(url, username, password)
 
     withResource(conn) {
@@ -102,7 +101,7 @@ class TableTest extends FunSuite {
   }
 
   test("All tables") {
-//    Class.forName("oracle.jdbc.OracleDriver")
+    //    Class.forName("oracle.jdbc.OracleDriver")
 
     implicit val conn: Connection = DriverManager.getConnection(url, username, password)
 
@@ -148,8 +147,8 @@ class TableTest extends FunSuite {
   test("mapping") {
     implicit val conn: Connection = DriverManager.getConnection(url, username, password)
     withResource(conn) {
-      val b1 = conn.createStatement().executeUpdate("DROP TABLE IF EXISTS TEST_TABLE")
-      val b2 = conn.createStatement().executeUpdate(
+      conn.createStatement().executeUpdate("DROP TABLE IF EXISTS TEST_TABLE")
+      conn.createStatement().executeUpdate(
         """
           |CREATE TABLE TEST_TABLE (
           |  id INT,
@@ -158,15 +157,18 @@ class TableTest extends FunSuite {
           |)
         """.stripMargin)
 
-      val b3 = conn.createStatement().executeUpdate("INSERT INTO TEST_TABLE(id, name, creation_date) VALUES (1, 'name 1', CURRENT_TIMESTAMP())")
-      
-      val rs = conn.createStatement().executeQuery("select * from TEST_TABLE")
+      conn.createStatement().executeUpdate("INSERT INTO TEST_TABLE(id, name, creation_date) VALUES (1, 'name 1', CURRENT_TIMESTAMP())")
+
+      val rs = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY).executeQuery("select * from TEST_TABLE")
       rs.next
       val tt = TestTable(rs)
 
+      rs.beforeFirst() // Reset the resultset because ResultSetDumper.dump consumes it too
+      println(ResultSetDumper.format(ResultSetDumper.dump(rs)))
+
       assert(tt.id.isDefined && tt.id.get === 1)
       assert(tt.name.isDefined && tt.name.get === "name 1")
-      
+
     }
   }
 
