@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Baptiste MORIN (408658)
+ * Copyright (c) 2014. Baptiste MORIN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ public enum SqlType {
    private int value;
 
 
-   private SqlType(int value) {
+   SqlType(int value) {
       this.value = value;
    }
 

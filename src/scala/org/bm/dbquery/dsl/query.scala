@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015. Baptiste MORIN (408658)
+ * Copyright (c) 2015. Baptiste MORIN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

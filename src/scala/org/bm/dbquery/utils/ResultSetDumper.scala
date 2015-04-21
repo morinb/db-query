@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Baptiste MORIN (408658)
+ * Copyright (c) 2014. Baptiste MORIN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,26 +58,26 @@ object ResultSetDumper {
   }
 
   def format(rows: List[List[String]])(implicit maxLength: Option[Int]): String = {
-    val maxColumnSize: Array[Int] = new Array[Int](rows(0).size)
+    val maxColumnSize: Array[Int] = new Array[Int](rows.head.size)
 
     // iterate over the list to compute max column length.
     for ((cols, rowIndex) <- rows.view.zipWithIndex) {
       for ((col, colIndex) <- cols.view.zipWithIndex) {
         if (col != null) {
-          if (col.size > maxColumnSize(colIndex)) {
+          if (col.length > maxColumnSize(colIndex)) {
 
             val size = maxLength match {
               case Some(l) => l
-              case None => col.size
+              case None => col.length
             }
 
-            maxColumnSize(colIndex) = Math.min(col.size, size)
+            maxColumnSize(colIndex) = Math.min(col.length, size)
           }
         }
       }
     }
 
-    val lineLength = maxColumnSize.foldLeft(0)(_ + _) + 3 * maxColumnSize.size
+    val lineLength = maxColumnSize.sum + 3 * maxColumnSize.length
 
     val sb = new StringBuilder(lineLength)
 
@@ -93,9 +93,9 @@ object ResultSetDumper {
         }
 
         val realText: String =
-          if (txt.size > size)
+          if (txt.length > size)
             StringUtils.abbreviate(txt, size)
-          else if (txt.size < size)
+          else if (txt.length < size)
             txt.padTo(maxColumnSize(colIndex), ' ')
           else txt
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Baptiste MORIN (408658)
+ * Copyright (c) 2014. Baptiste MORIN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,12 @@ package org.bm.dbquery
 
 import java.sql.{Connection, DriverManager}
 
+import org.bm.dbquery.dsl.query.{*, select}
 import org.bm.dbquery.utils.ResultSetDumper
 import org.bm.dbquery.utils.WithResource.withResource
 import org.scalatest.FunSuite
+
+import scala.language.postfixOps
 
 /**
  *
@@ -140,6 +143,31 @@ class TableTest extends FunSuite {
     }
 
     assert(conn.isClosed)
+  }
+
+  test("mapping") {
+    implicit val conn: Connection = DriverManager.getConnection(url, username, password)
+    withResource(conn) {
+      val b1 = conn.createStatement().executeUpdate("DROP TABLE IF EXISTS TEST_TABLE")
+      val b2 = conn.createStatement().executeUpdate(
+        """
+          |CREATE TABLE TEST_TABLE (
+          |  id INT,
+          |  name VARCHAR(32),
+          |  creation_date TIMESTAMP
+          |)
+        """.stripMargin)
+
+      val b3 = conn.createStatement().executeUpdate("INSERT INTO TEST_TABLE(id, name, creation_date) VALUES (1, 'name 1', CURRENT_TIMESTAMP())")
+      
+      val rs = conn.createStatement().executeQuery("select * from TEST_TABLE")
+      rs.next
+      val tt = TestTable(rs)
+
+      assert(tt.id.isDefined && tt.id.get === 1)
+      assert(tt.name.isDefined && tt.name.get === "name 1")
+      
+    }
   }
 
 }
