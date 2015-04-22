@@ -20,7 +20,7 @@ import java.sql.ResultSet
 
 import org.joda.time.LocalDateTime
 
-import scala.language.implicitConversions
+import scala.language.{reflectiveCalls, implicitConversions}
 
 package object dbquery {
   def column[T](columnName: String)(implicit f: (ResultSet, String) => T, rs: ResultSet, columnNames: IndexedSeq[String]): Option[T] = {
@@ -33,6 +33,10 @@ package object dbquery {
     } else None
   }
 
+  def withResource(x: {def close(): Unit})(todo: => Unit): Unit = {
+    todo
+    x.close()
+  }
 
   object Implicits {
     implicit def columnNames(implicit rs: ResultSet): IndexedSeq[String] =

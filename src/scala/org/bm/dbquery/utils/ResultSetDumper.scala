@@ -33,11 +33,6 @@ object ResultSetDumper {
     implicit lazy val MaxLength = None
   }
 
-  def withResource(x: {def close(): Unit})(todo: => Unit): Unit = {
-    todo
-    x.close()
-  }
-
   def dump(rs: ResultSet): List[List[String]] = {
     var result: List[List[String]] = List()
 
