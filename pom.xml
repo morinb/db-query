@@ -4,7 +4,7 @@
 
     <groupId>org.bm</groupId>
     <artifactId>db-query</artifactId>
-    <version>0.1.0.3</version>
+    <version>0.1.0.4</version>
     <packaging>jar</packaging>
 
     <name>DB Query</name>
