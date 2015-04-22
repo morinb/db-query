@@ -21,6 +21,7 @@ import java.sql.ResultSet
 import org.apache.commons.lang.StringUtils
 
 import scala.annotation.tailrec
+import scala.language.reflectiveCalls
 
 /**
  *
@@ -30,6 +31,11 @@ object ResultSetDumper {
 
   object Implicits {
     implicit lazy val MaxLength = None
+  }
+
+  def withResource(x: {def close(): Unit})(todo: => Unit): Unit = {
+    todo
+    x.close()
   }
 
   def dump(rs: ResultSet): List[List[String]] = {
