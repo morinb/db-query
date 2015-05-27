@@ -33,10 +33,6 @@ package object dbquery {
     } else None
   }
 
-  def withResource(x: {def close(): Unit})(todo: => Unit): Unit = {
-    todo
-    x.close()
-  }
 
   object Implicits {
     implicit def columnNames(implicit rs: ResultSet): IndexedSeq[String] =
