@@ -73,7 +73,7 @@ class TableTest extends FunSuite {
     }
   }
 
-  test("API") {
+  ignore("API") {
     //    Class.forName("oracle.jdbc.OracleDriver")
     implicit val conn: Connection = DriverManager.getConnection(url, username, password)
 
