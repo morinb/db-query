@@ -16,8 +16,6 @@
 
 package org.bm.dbquery;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
-
 /**
  * @author Baptiste Morin
  */
@@ -42,13 +40,13 @@ public enum KeyRule {
       return name();
    }
 
-   public static KeyRule from(int value) throws InvalidArgumentException {
+   public static KeyRule from(int value) throws IllegalArgumentException {
       for (KeyRule kr : values()) {
          if (kr.value == value) {
             return kr;
          }
       }
-      throw new InvalidArgumentException(new String[]{String.format("%d has not been found in enum KeyRule.", value)});
+      throw new IllegalArgumentException(String.format("%d has not been found in enum KeyRule.", value));
    }
 
 }

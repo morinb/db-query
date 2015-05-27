@@ -16,8 +16,6 @@
 
 package org.bm.dbquery;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
-
 /**
  * @author Baptiste Morin
  */
@@ -62,13 +60,13 @@ public enum SqlType {
       this.value = value;
    }
 
-   public static SqlType from(int value) throws InvalidArgumentException {
-      for(SqlType st : values()) {
-         if(st.value == value) {
+   public static SqlType from(int value) throws IllegalArgumentException {
+      for (SqlType st : values()) {
+         if (st.value == value) {
             return st;
          }
       }
-      throw new InvalidArgumentException(new String[]{String.format("%d has not been found in enum SqlType.", value)});
+      throw new IllegalArgumentException(String.format("%d has not been found in enum SqlType.", value));
    }
 
    @Override
