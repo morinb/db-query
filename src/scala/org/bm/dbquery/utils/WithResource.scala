@@ -27,4 +27,10 @@ object WithResource {
     todo
     x.close()
   }
+
+  def withResourceResult[T](x:{def close(): Unit})(todo: => T): T = {
+    val t = todo
+    x.close()
+    t
+  }
 }
