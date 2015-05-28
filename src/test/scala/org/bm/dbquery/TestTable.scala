@@ -36,11 +36,9 @@ object TestTable {
 
 
   import Implicits._
-  def apply(implicit resultSet: ResultSet): TestTable =
-    new TestTable(column[Int]("id"),
-      column[String]("name"),
-      column[LocalDateTime]("creation_date")
-    )
+
+  def apply(implicit resultSet: ResultSet): TestTable = new TestTable(column("id"), column("name"), column("creation_date")
+  )
 }
 
 
