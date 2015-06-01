@@ -33,21 +33,19 @@ There are actually 2 utils classes : WithResource and ResultSetDumper.
  
 ## WithResource
 
-WithResource define 2 methods that ease the handling of closeable resource, like SQL connection for example.
+WithResource define a method that ease the handling of closeable resource, like SQL connection for example.
 
 ```scala
     import org.bm.dbquery.utils.WithResource._
 
     val conn: Connection = ...
 
-    withResource(conn) {
-        // do something with the connection
-        // it will be automatically close at the end of the withResource block.
-    }
 
-    val result = withResourceResult(conn) {
+    val result = withResource(conn) {
         // do something with the connection and return a result
         // the connection will be closed at the end of the block and the result returned.
+        // if an exception occurs it is thrown. If an additional exception is thrown while closing the resource, 
+        // it is added as suppressed exception. 
     }
 ```
 
