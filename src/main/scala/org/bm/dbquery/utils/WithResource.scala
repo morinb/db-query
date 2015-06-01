@@ -23,14 +23,26 @@ import scala.language.reflectiveCalls
  * @author Baptiste Morin
  */
 object WithResource {
-  def withResource(x: {def close(): Unit})(todo: => Unit): Unit = {
-    todo
-    x.close()
-  }
+  def withResource[ReturnType](closeable: {def close(): Unit})(todo: => ReturnType): ReturnType = {
+    var throwable: Throwable = null
 
-  def withResourceResult[T](x:{def close(): Unit})(todo: => T): T = {
-    val t = todo
-    x.close()
-    t
+    try {
+      todo
+    } catch {
+      case exceptionTodo: Exception => throwable = exceptionTodo
+        throw exceptionTodo
+    } finally {
+      if (closeable != null) {
+        if (throwable != null) {
+          try {
+            closeable.close()
+          } catch {
+            case exceptionClose: Exception => throwable.addSuppressed(exceptionClose)
+          }
+        } else {
+          closeable.close()
+        }
+      }
+    }
   }
 }
