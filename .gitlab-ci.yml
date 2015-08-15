@@ -1,3 +1,4 @@
 compile:
   script:
+    - apt-get install -y mvn
     - mvn clean compile package
