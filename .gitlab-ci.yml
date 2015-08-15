@@ -1,5 +1,6 @@
 test:
   script:
+    - apt-get update
     - apt-cache search maven
     - apt-get install maven
     - mvn clean compile test
