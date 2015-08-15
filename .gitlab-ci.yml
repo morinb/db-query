@@ -1,5 +1,4 @@
-
 test:
   script:
-    - apt-get install -y maven
+    - apt-get install maven
     - mvn clean compile test
