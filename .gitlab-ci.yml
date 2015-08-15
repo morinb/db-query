@@ -1,5 +1,5 @@
-image: maven:3.2-jdk-7-onbuild
-compile:
+
+test:
   script:
     - apt-get install -y maven
-    - mvn clean compile package
+    - mvn clean compile test
