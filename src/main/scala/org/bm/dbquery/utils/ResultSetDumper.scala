@@ -66,13 +66,7 @@ object ResultSetDumper {
       for ((col, colIndex) <- cols.view.zipWithIndex) {
         if (col != null) {
           if (col.length > maxColumnSize(colIndex)) {
-
-            val size = maxLength match {
-              case Some(l) => l
-              case None => col.length
-            }
-
-            maxColumnSize(colIndex) = Math.min(col.length, size)
+            maxColumnSize(colIndex) = Math.min(col.length, maxLength.getOrElse(col.length))
           }
         }
       }
