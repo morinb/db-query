@@ -28,6 +28,20 @@ The org.bm.dbquery package contains an object that defines usefull implicits : [
 It contains a columnNames method that takes an implicit ResultSet, hence the implicit ResultSet of the MyTable apply method.
 It contains also a bunch of implicit method that map the ResultSet.getXXX methods.
 
+A table instance, will contain one line of the ```ResultSet```. To get an array of all lines, you could use the ```RichResultSet``` class
+which adds a ```map``` method to a ```ResultSet```.
+
+```scala
+import org.bm.dbquery.utils.RichResultSet.enrichResultSet
+
+val rs:ResultSet = _
+
+val datas:List[MyTable] = rs map (res => MyTable(res))
+
+// Do something with the rows in datas.
+
+```
+
 # Utils classes
 There are actually 2 utils classes : WithResource and ResultSetDumper.
  

@@ -158,16 +158,28 @@ class TableTest extends FunSuite {
         """.stripMargin)
 
       conn.createStatement().executeUpdate("INSERT INTO TEST_TABLE(id, name, creation_date) VALUES (1, 'name 1', CURRENT_TIMESTAMP())")
+      conn.createStatement().executeUpdate("INSERT INTO TEST_TABLE(id, name, creation_date) VALUES (2, 'name 2', CURRENT_TIMESTAMP())")
 
       val rs = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY).executeQuery("select * from TEST_TABLE")
-      rs.next
-      val tt = TestTable(rs)
+
+      import org.bm.dbquery.utils.RichResultSet.enrichResultSet
+
+      val datas = rs.map(rs => TestTable(rs))
+
+      val tt = datas.head
+      val tt2 = datas(1)
+
 
       rs.beforeFirst() // Reset the resultset because ResultSetDumper.dump consumes it too
       println(ResultSetDumper.format(ResultSetDumper.dump(rs)))
 
       assert(tt.id.isDefined && tt.id.get === 1)
       assert(tt.name.isDefined && tt.name.get === "name 1")
+
+      assert(tt2.id.isDefined && tt2.id.get === 2)
+      assert(tt2.name.isDefined && tt2.name.get === "name 2")
+
+
 
     }
   }
